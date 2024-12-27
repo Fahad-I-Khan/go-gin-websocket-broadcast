@@ -1,4 +1,4 @@
-module github.com/Fahad-I-Khan/go-websocket-broadcast
+module github.com/Fahad-I-Khan/go-gin-websocket-broadcast
 
 go 1.23.3
 
