@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #messages {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+        }
+        #inputContainer {
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 5px 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Chat</h1>
+    <div id="messages"></div>
+    <div id="inputContainer">
+        <input type="text" id="messageInput" placeholder="Type your message here..." />
+        <button id="sendButton">Send</button>
+    </div>
+
+    <script>
+        const serverUrl = "ws://localhost:8080/ws"; // Change if necessary
+        const socket = new WebSocket(serverUrl);
+
+        const messagesDiv = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        // Display received messages
+        socket.onmessage = (event) => {
+            const message = document.createElement('div');
+            message.textContent = `Received: ${event.data}`;
+            messagesDiv.appendChild(message);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to the bottom
+        };
+
+        // Handle send button click
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value;
+            if (message) {
+                socket.send(message); // Send the message to the WebSocket server
+                const sentMessage = document.createElement('div');
+                sentMessage.textContent = `Sent: ${message}`;
+                sentMessage.style.color = 'blue';
+                messagesDiv.appendChild(sentMessage);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                messageInput.value = ''; // Clear the input
+            }
+        });
+
+        // Handle errors
+        socket.onerror = (error) => {
+            console.error("WebSocket Error:", error);
+        };
+
+        // Handle connection closure
+        socket.onclose = () => {
+            const message = document.createElement('div');
+            message.textContent = "Connection closed.";
+            message.style.color = 'red';
+            messagesDiv.appendChild(message);
+        };
+    </script>
+</body>
+</html>
